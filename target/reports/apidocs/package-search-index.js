@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"wallyland.wallylandvacationplanner"},{"l":"wallyland.wallylandvacationplanner.controller"},{"l":"wallyland.wallylandvacationplanner.model"}];updateSearchResults();
