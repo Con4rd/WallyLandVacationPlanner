@@ -28,6 +28,32 @@ public class UserController {
      * @return true if the purchase was successful, false otherwise.
      */
     public boolean purchaseItem(String userId, String itemType, String itemId, int quantity) {
-        return purchaseService.processPurchase(userId, itemType, itemId, quantity);
+        // Validate input parameters
+        if (userId == null || userId.isEmpty()) {
+            System.out.println("Invalid user ID.");
+            return false;
+        }
+
+        if (itemType == null || itemType.isEmpty()) {
+            System.out.println("Invalid item type.");
+            return false;
+        }
+
+        if (quantity <= 0) {
+            System.out.println("Quantity must be greater than zero.");
+            return false;
+        }
+
+        // Call the PurchaseService to process the purchase
+        boolean purchaseSuccessful = purchaseService.processPurchase(userId, itemType, itemId, quantity);
+
+        // Log the outcome
+        if (purchaseSuccessful) {
+            System.out.println("Purchase successful for user " + userId);
+        } else {
+            System.out.println("Purchase failed for user " + userId);
+        }
+
+        return purchaseSuccessful;
     }
 }
