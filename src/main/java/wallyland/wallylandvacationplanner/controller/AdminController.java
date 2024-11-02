@@ -4,24 +4,24 @@
  */
 package wallyland.wallylandvacationplanner.controller;
 
-public class UserController {
-    public void handleUserRequests() {
+public class AdminController {
+    public void handleAdminRequests() {
         // To be implemented
     }
     
-    public void processBookings() {
+    public void manageResources() {
         // To be implemented
     }
     
-    public void managePurchases() {
+    public void generateReports() {
         // To be implemented
     }
     
-    public void handleScheduling() {
+    public void handleSupport() {
         // To be implemented
     }
     
-    public void provideRealTimeUpdates() {
+    public void monitorSystemStatus() {
         // To be implemented
     }
 }
