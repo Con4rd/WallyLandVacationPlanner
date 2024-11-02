@@ -50,4 +50,22 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    /**
+     * Displays user information in a formatted manner.
+     */
+    public void displayUserInfo() {
+        System.out.println("User ID: " + userId);
+        System.out.println("Username: " + username);
+        System.out.println("Email: " + email);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId='" + userId + '\'' +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }
