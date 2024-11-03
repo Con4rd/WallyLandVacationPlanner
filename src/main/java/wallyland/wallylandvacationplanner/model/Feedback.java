@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package wallyland.wallylandvacationplanner.model;
+import java.util.Objects;
 
 /**
  * Represents a feedback given by a user.
@@ -26,7 +27,7 @@ public class Feedback {
         this.feedbackNo = feedbackNo;
         this.userId = userId;
         this.message = message;
-        this.rating = rating;
+        setRating(rating);
     }
 
     // Getters and setters
@@ -60,7 +61,35 @@ public class Feedback {
     }
 
     public void setRating(int rating) {
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5.");
+        }
         this.rating = rating;
+    }
+   
+    
+    @Override
+    public String toString() {
+        return "Feedback " + feedbackNo + "\n" +
+       "User ID: " + userId + "\n" +
+       "Rating: " + rating +
+       "Message: [" + message + "]" ;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Feedback feedback = (Feedback) o;
+        return rating == feedback.rating &&
+                Objects.equals(feedbackNo, feedback.feedbackNo) &&
+                Objects.equals(userId, feedback.userId) &&
+                Objects.equals(message, feedback.message);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(feedbackNo, userId, message, rating);
     }
     
 }
