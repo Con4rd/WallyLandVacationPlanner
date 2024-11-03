@@ -5,14 +5,26 @@
 package wallyland.wallylandvacationplanner.controller;
 
 public class UserController {
-    public void handleUserRequests() {
-        // To be implemented
+     private PurchaseService purchaseService;
+
+    // Constructor to initialize PurchaseService
+    public UserController(PurchaseService purchaseService) {
+        this.purchaseService = purchaseService;
     }
-<<<<<<< HEAD
-    
-    public void processBookings() {
-        // To be implemented
-=======
+
+    public void handleUserRequests(String userId) {
+        // Placeholder for handling different user requests
+        System.out.println("Handling user requests for user: " + userId);
+        // Logic to determine which user action to take could go here
+    }
+
+    public void processBookings(String userId, String itemType, String itemId, int quantity) {
+        if (purchaseItem(userId, itemType, itemId, quantity)) {
+            System.out.println("Booking processed successfully for user: " + userId);
+        } else {
+            System.out.println("Booking failed for user: " + userId);
+        }
+    }
 
     /**
      * Processes the purchase of tickets, food, or drinks.
@@ -52,18 +64,28 @@ public class UserController {
         }
 
         return purchaseSuccessful;
->>>>>>> 323a11568104000f49b5b1c9cab51061735347e4
     }
-    
-    public void managePurchases() {
-        // To be implemented
+
+    public void managePurchases(String userId) {
+        // Display purchase history for the user
+        List<Purchase> userPurchases = purchaseService.getPurchaseHistory(userId);
+        if (userPurchases.isEmpty()) {
+            System.out.println("No purchases found for user: " + userId);
+        } else {
+            System.out.println("Purchase history for user: " + userId);
+            for (Purchase purchase : userPurchases) {
+                System.out.println(purchase);
+            }
+        }
     }
-    
+
     public void handleScheduling() {
-        // To be implemented
+        // Logic for handling user scheduling can be implemented here
+        System.out.println("Handling user scheduling.");
     }
-    
+
     public void provideRealTimeUpdates() {
-        // To be implemented
+        // Logic to provide real-time updates (e.g., updates on purchases, bookings)
+        System.out.println("Providing real-time updates.");
     }
 }
