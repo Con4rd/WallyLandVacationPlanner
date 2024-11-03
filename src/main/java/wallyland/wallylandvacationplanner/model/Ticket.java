@@ -53,4 +53,8 @@ public class Ticket {
     public void setPrice(double price) {
         this.price = price;
     }
+     @Override
+    public String toString() {
+        return ticketId + " " + type + " -- $" + String.format("%.2f", price) + isValid;
+    }
 }
