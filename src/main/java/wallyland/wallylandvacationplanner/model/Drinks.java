@@ -61,5 +61,12 @@ public class Drinks {
     public void setPrice(double price) {
         this.price = price;
     }
+    @Override
+    public String toString() {
+        return "Drink:" +
+                drinkId + " " + name + "--" +
+                price + isValid ;
+    }
 
+}
 }
