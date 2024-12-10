@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package wallyland.wallylandvacationplanner.model;
 
 /**
@@ -11,60 +7,23 @@ package wallyland.wallylandvacationplanner.model;
 public class Food {
     private String foodId;
     private String name;
-    private boolean isValid;
     private double price;
+    private boolean isValid;
 
-    /**
-     * Constructs a new food.
-     *
-     * @param foodId The unique identifier of the food.
-     * @param name   The name of the food.
-     * @param price  The price of the food.
-     * @param isValid  The validity of the food(if it's available or out of stock).
-     */
-    public Food(String foodId, String name,double price, boolean isValid) {
+    public Food(String foodId, String name, double price, boolean isValid) {
         this.foodId = foodId;
         this.name = name;
         this.price = price;
         this.isValid = isValid;
     }
 
-    // Getters and Setters
-    public String getFoodId() {
-        return foodId;
-    }
+    public String getFoodId() { return foodId; }
+    public String getName() { return name; }
+    public double getPrice() { return price; }
+    public boolean isValid() { return isValid; }
 
-    public void setFoodId(String foodId) {
-        this.foodId = foodId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean isIsValid() {
-        return isValid;
-    }
-
-    public void setIsValid(boolean isValid) {
-        this.isValid = isValid;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
     @Override
     public String toString() {
-        return "Food" +
-                foodId + " " + name + "--" + price + isValid;
+        return name + " ($" + String.format("%.2f", price) + ") " + (isValid ? "Available" : "Out of Stock");
     }
-
 }
