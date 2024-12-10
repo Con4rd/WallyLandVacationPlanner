@@ -1,16 +1,14 @@
 package wallyland.wallylandvacationplanner.view;
 
-import wallyland.wallylandvacationplanner.model.PurchaseService;
-import wallyland.wallylandvacationplanner.model.Food;
-import wallyland.wallylandvacationplanner.model.Drinks;
-import wallyland.wallylandvacationplanner.model.Ticket;
+import wallyland.wallylandvacationplanner.model.*;
 import wallyland.wallylandvacationplanner.controller.ActivityManager;
 import wallyland.wallylandvacationplanner.view.ActivityPanel;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-
+import java.time.format.DateTimeFormatter;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import wallyland.wallylandvacationplanner.model.PurchaseService.Purchase; // Import Purchase class
 
 public class UserInterface extends JFrame {
@@ -95,6 +93,12 @@ public class UserInterface extends JFrame {
         JMenuItem openAdminInterfaceItem = new JMenuItem("Open Admin Interface");
         openAdminInterfaceItem.addActionListener(e -> openAdminInterface());
         adminMenu.add(openAdminInterfaceItem);
+
+        //Create Purchase History in cartMenu
+        JMenuItem historyItem = new JMenuItem("Purchase History");
+        historyItem.addActionListener(e -> showPurchaseHistory());
+        cartMenu.add(historyItem);
+
 
         menuBar.add(shopMenu);
         menuBar.add(cartMenu);
@@ -223,26 +227,50 @@ public class UserInterface extends JFrame {
     cardLayout.show(mainPanel, "PURCHASE");
 }
 
-private void showPurchaseHistory(String userId) {
-    List<Purchase> purchaseHistory = purchaseService.getPurchaseHistory(userId); // Assuming PurchaseService has this method
+    private void showPurchaseHistory() {
+        String userId = "U001"; // Should be dynamic in real implementation
+        List<Receipt> receipts = purchaseService.getUserReceipts(userId);
 
-    JPanel historyPanel = new JPanel(new BorderLayout());
-    JTextArea historyTextArea = new JTextArea(15, 50);
-    historyTextArea.setEditable(false);
+        JDialog historyDialog = new JDialog(this, "Purchase History", true);
+        historyDialog.setLayout(new BorderLayout());
 
-    if (purchaseHistory.isEmpty()) {
-        historyTextArea.setText("No previous purchases.");
-    } else {
-        StringBuilder historyContents = new StringBuilder("Your Purchase History:\n\n");
-        for (Purchase purchase : purchaseHistory) {
-            historyContents.append(purchase.toString()).append("\n");
-        }
-        historyTextArea.setText(historyContents.toString());
-    }
+        DefaultListModel<Receipt> listModel = new DefaultListModel<>();
+        receipts.forEach(listModel::addElement);
 
-    historyPanel.add(new JScrollPane(historyTextArea), BorderLayout.CENTER);
-    mainPanel.add(historyPanel, "PURCHASE_HISTORY");
-    cardLayout.show(mainPanel, "PURCHASE_HISTORY");
+        JList<Receipt> receiptList = new JList<>(listModel);
+        receiptList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                                                          int index, boolean isSelected, boolean cellHasFocus) {
+                Receipt receipt = (Receipt) value;
+                String text = String.format("Receipt %s - %s - $%.2f",
+                        receipt.getReceiptId(),
+                        receipt.getPurchaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                        receipt.getTotalAmount());
+                return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
+            }
+        });
+
+        receiptList.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    Receipt selected = receiptList.getSelectedValue();
+                    if (selected != null) {
+                        showReceipt(selected);
+                    }
+                }
+            }
+        });
+
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> historyDialog.dispose());
+
+        historyDialog.add(new JScrollPane(receiptList), BorderLayout.CENTER);
+        historyDialog.add(closeButton, BorderLayout.SOUTH);
+
+        historyDialog.setSize(400, 400);
+        historyDialog.setLocationRelativeTo(this);
+        historyDialog.setVisible(true);
     }
 
 
@@ -523,19 +551,55 @@ private void showPurchaseHistory(String userId) {
 
         boolean paymentSuccess = (paymentAttemptCount % 3) != 0;
         if (paymentSuccess) {
+            // Generate receipt
+            Receipt receipt = purchaseService.generateReceipt("U001", paymentMethod);
 
-            // Clear the cart after successful payment
+            // Clear the cart
             purchaseService.clearCart("U001");
 
-            showSuccessMessage(String.format(
-                "Payment successful! Total: $%.2f\nThank you for your purchase.", totalPrice));
+            // Show receipt
+            showReceipt(receipt);
+
+            //refresh cart display
+            showCart();
+
+            showSuccessMessage("Payment successful! Receipt has been generated.");
         } else {
             showErrorMessage("Payment failed. Please try again.");
         }
     } else {
         showErrorMessage("Checkout canceled.");
     }
-}
+ }
+
+    private void showReceipt(Receipt receipt) {
+        JDialog receiptDialog = new JDialog(this, "Purchase Receipt", true);
+        receiptDialog.setLayout(new BorderLayout());
+
+        JTextArea receiptText = new JTextArea(receipt.formatReceipt());
+        receiptText.setEditable(false);
+        receiptText.setFont(new Font("Monospaced", Font.PLAIN, 12));
+
+        JButton printButton = new JButton("Print Receipt");
+        printButton.addActionListener(e -> {
+            // Add printing functionality later if needed
+            showSuccessMessage("Printing feature will be implemented soon!");
+        });
+
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> receiptDialog.dispose());
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(printButton);
+        buttonPanel.add(closeButton);
+
+        receiptDialog.add(new JScrollPane(receiptText), BorderLayout.CENTER);
+        receiptDialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        receiptDialog.setSize(400, 600);
+        receiptDialog.setLocationRelativeTo(this);
+        receiptDialog.setVisible(true);
+    }
 
     public void showActivityManagement() {
         ActivityPanel activityPanel = new ActivityPanel(activityManager);

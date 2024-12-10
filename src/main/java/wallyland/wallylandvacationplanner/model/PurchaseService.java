@@ -14,11 +14,13 @@ public class PurchaseService {
     private List<Purchase> purchaseHistory;
     // Temporary storage for cart items
     private List<Purchase> cart; // List to store items added to cart
+    private List<Receipt> receiptHistory; //List for receipt history
 
     public PurchaseService() {
         availableItems = new HashMap<>();
         purchaseHistory = new ArrayList<>();
         cart = new ArrayList<>(); // Initialize cart
+        receiptHistory = new ArrayList<>();
         initializeTemporaryItems();
     }
 
@@ -208,6 +210,32 @@ public class PurchaseService {
             }
         }
         return false;
+    }
+
+    //receipt methods
+
+    public Receipt generateReceipt(String userId, String paymentMethod) {
+        List<Purchase> cartItems = getCartItems(userId);
+        double total = cartItems.stream()
+                .mapToDouble(Purchase::getTotalPrice)
+                .sum();
+
+        Receipt receipt = new Receipt(userId, new ArrayList<>(cartItems), total, paymentMethod);
+        receiptHistory.add(receipt);
+        return receipt;
+    }
+
+    public List<Receipt> getUserReceipts(String userId) {
+        return receiptHistory.stream()
+                .filter(receipt -> receipt.getUserId().equals(userId))
+                .toList();
+    }
+
+    public Receipt getReceiptById(String receiptId) {
+        return receiptHistory.stream()
+                .filter(receipt -> receipt.getReceiptId().equals(receiptId))
+                .findFirst()
+                .orElse(null);
     }
 
 
