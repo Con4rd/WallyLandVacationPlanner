@@ -1,8 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package wallyland.wallylandvacationplanner.controller;
+
+import wallyland.wallylandvacationplanner.model.PurchaseService;
+import java.util.List;
+
 
 public class UserController {
      private PurchaseService purchaseService;
@@ -66,18 +67,10 @@ public class UserController {
         return purchaseSuccessful;
     }
 
-    public void managePurchases(String userId) {
-        // Display purchase history for the user
-        List<Purchase> userPurchases = purchaseService.getPurchaseHistory(userId);
-        if (userPurchases.isEmpty()) {
-            System.out.println("No purchases found for user: " + userId);
-        } else {
-            System.out.println("Purchase history for user: " + userId);
-            for (Purchase purchase : userPurchases) {
-                System.out.println(purchase);
-            }
-        }
-    }
+public void managePurchases(String userId) {
+    // Just display a message instead of showing purchases
+    System.out.println("Manage purchases functionality not implemented.");
+}
 
     public void handleScheduling() {
         // Logic for handling user scheduling can be implemented here
@@ -88,4 +81,5 @@ public class UserController {
         // Logic to provide real-time updates (e.g., updates on purchases, bookings)
         System.out.println("Providing real-time updates.");
     }
+    
 }
