@@ -119,9 +119,9 @@ public class UserInterface extends JFrame {
 
         JLabel instructionsLabel = new JLabel(
             "<html><center>Use the menu above to:<br>" +
-            "â€¢ Browse and purchase tickets<br>" +
-            "â€¢ Order food and drinks<br>" +
-            "â€¢ View your shopping cart</center></html>",
+            "Browse and purchase tickets<br>" +
+            "Order food and drinks<br>" +
+            "View your shopping cart</center></html>",
             SwingConstants.CENTER
         );
 
@@ -244,35 +244,198 @@ private void showPurchaseHistory(String userId) {
     mainPanel.add(historyPanel, "PURCHASE_HISTORY");
     cardLayout.show(mainPanel, "PURCHASE_HISTORY");
     }
+
+
     public void showCart() {
-    String userId = "U001"; // Ideally, this should be dynamic
-    List<Purchase> purchases = purchaseService.getCartItems(userId);
+        String userId = "U001"; // Ideally, this should be dynamic
+        List<Purchase> purchases = purchaseService.getCartItems(userId);
 
-    JPanel cartPanel = new JPanel(new BorderLayout());
-    JTextArea cartTextArea = new JTextArea(15, 50);
-    cartTextArea.setEditable(false);
+        JPanel cartPanel = new JPanel(new BorderLayout());
+        JPanel itemsPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-    JButton checkoutButton = new JButton("Proceed to Checkout");
+        // Add headers
+        String[] headers = {"Item", "Price", "Quantity", "Subtotal", "Action"};
+        Font boldFont = new Font(getFont().getFontName(), Font.BOLD, getFont().getSize());
 
-    if (purchases.isEmpty()) {
-        cartTextArea.setText("Your cart is empty.");
-        checkoutButton.setEnabled(false); // Disable button if cart is empty
-    } else {
-        StringBuilder cartContents = new StringBuilder("Items in your cart:\n\n");
-        for (Purchase purchase : purchases) {
-            cartContents.append(purchase.toString()).append("\n");
+        for (int i = 0; i < headers.length; i++) {
+            gbc.gridx = i;
+            gbc.gridy = 0;
+            JLabel headerLabel = new JLabel(headers[i], SwingConstants.LEFT);
+            headerLabel.setFont(boldFont);
+            itemsPanel.add(headerLabel, gbc);
         }
-        cartTextArea.setText(cartContents.toString());
-        checkoutButton.setEnabled(true); // Enable button if cart has items
+
+        if (purchases.isEmpty()) {
+            gbc.gridy = 1;
+            gbc.gridx = 0;
+            gbc.gridwidth = 5;
+            itemsPanel.add(new JLabel("Your cart is empty."), gbc);
+        } else {
+            int row = 1;
+            for (Purchase purchase : purchases) {
+                gbc.gridy = row;
+                gbc.gridwidth = 1;
+
+                // Item name
+                gbc.gridx = 0;
+                String itemName;
+                if (purchase.getItem() instanceof Ticket) {
+                    itemName = ((Ticket) purchase.getItem()).getType();
+                } else if (purchase.getItem() instanceof Food) {
+                    itemName = ((Food) purchase.getItem()).getName();
+                } else if (purchase.getItem() instanceof Drinks) {
+                    itemName = ((Drinks) purchase.getItem()).getName();
+                } else {
+                    itemName = "Unknown Item";
+                }
+                itemsPanel.add(new JLabel(itemName), gbc);
+
+                // Unit price
+                gbc.gridx = 1;
+                JLabel priceLabel = new JLabel(String.format("$%.2f", purchase.getUnitPrice()));
+                itemsPanel.add(priceLabel, gbc);
+
+                // Quantity adjustment panel
+                gbc.gridx = 2;
+                JPanel quantityPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+                SpinnerNumberModel spinnerModel = new SpinnerNumberModel(
+                        purchase.getQuantity(), 0, 99, 1);
+                JSpinner quantitySpinner = new JSpinner(spinnerModel);
+                quantitySpinner.setPreferredSize(new Dimension(60, 25));
+
+                JButton decreaseButton = new JButton("-");
+                JButton increaseButton = new JButton("+");
+
+                // Subtotal label (will be updated with quantity changes)
+                JLabel subtotalLabel = new JLabel(String.format("$%.2f", purchase.getTotalPrice()));
+
+                // Update handlers for quantity changes
+                Runnable updatePrice = () -> {
+                    int newQuantity = (int) quantitySpinner.getValue();
+                    if (newQuantity >= 0) {
+                        double newSubtotal = purchase.getUnitPrice() * newQuantity;
+                        subtotalLabel.setText(String.format("$%.2f", newSubtotal));
+                        updateCartQuantity(userId, purchase, newQuantity);
+                        updateTotalPrice(purchases); // Update the total price display
+                    }
+                };
+
+                decreaseButton.addActionListener(e -> {
+                    int currentValue = (int) quantitySpinner.getValue();
+                    if (currentValue > 0) {
+                        quantitySpinner.setValue(currentValue - 1);
+                        updatePrice.run();
+                    }
+                });
+
+                increaseButton.addActionListener(e -> {
+                    int currentValue = (int) quantitySpinner.getValue();
+                    quantitySpinner.setValue(currentValue + 1);
+                    updatePrice.run();
+                });
+
+                quantitySpinner.addChangeListener(e -> updatePrice.run());
+
+                quantityPanel.add(decreaseButton);
+                quantityPanel.add(quantitySpinner);
+                quantityPanel.add(increaseButton);
+                itemsPanel.add(quantityPanel, gbc);
+
+                // Subtotal
+                gbc.gridx = 3;
+                itemsPanel.add(subtotalLabel, gbc);
+
+                // Remove button
+                gbc.gridx = 4;
+                JButton removeButton = new JButton("Remove");
+                removeButton.addActionListener(e -> {
+                    if (purchaseService.updateCartItemQuantity(userId, purchase, 0)) {
+                        showSuccessMessage("Item removed from cart!");
+                        showCart(); // Refresh the cart display
+                    } else {
+                        showErrorMessage("Failed to remove item from cart.");
+                    }
+                });
+                itemsPanel.add(removeButton, gbc);
+
+                row++;
+            }
+
+            // Add total price row
+            gbc.gridy = row;
+            gbc.gridx = 0;
+            gbc.gridwidth = 3;
+            gbc.anchor = GridBagConstraints.EAST;
+            JLabel totalLabel = new JLabel("Total:", SwingConstants.RIGHT);
+            totalLabel.setFont(boldFont);
+            itemsPanel.add(totalLabel, gbc);
+
+            gbc.gridx = 3;
+            gbc.gridwidth = 2;
+            double totalPrice = purchases.stream()
+                    .mapToDouble(Purchase::getTotalPrice)
+                    .sum();
+            JLabel totalPriceLabel = new JLabel(String.format("$%.2f", totalPrice), SwingConstants.LEFT);
+            totalPriceLabel.setFont(boldFont);
+            itemsPanel.add(totalPriceLabel, gbc);
+        }
+
+        // Add scrolling capability
+        JScrollPane scrollPane = new JScrollPane(itemsPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        cartPanel.add(scrollPane, BorderLayout.CENTER);
+
+        // Checkout button panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton checkoutButton = new JButton("Proceed to Checkout");
+        checkoutButton.setEnabled(!purchases.isEmpty());
+        checkoutButton.addActionListener(e -> processCheckout());
+        buttonPanel.add(checkoutButton);
+        cartPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        mainPanel.add(cartPanel, "CART");
+        cardLayout.show(mainPanel, "CART");
     }
 
-    cartPanel.add(new JScrollPane(cartTextArea), BorderLayout.CENTER);
-    checkoutButton.addActionListener(e -> processCheckout());
-    cartPanel.add(checkoutButton, BorderLayout.SOUTH);
+    //helper method for updatecart with showCart()
+    private void updateCartQuantity(String userId, Purchase purchase, int newQuantity) {
+        if (purchaseService.updateCartItemQuantity(userId, purchase, newQuantity)) {
+            if (newQuantity == 0) {
+                showSuccessMessage("Item removed from cart!");
+            } else {
+                showSuccessMessage("Quantity updated!");
+            }
+            showCart(); // Refresh the cart display
+        } else {
+            showErrorMessage("Failed to update quantity.");
+        }
+    }
 
-    mainPanel.add(cartPanel, "CART");
-    cardLayout.show(mainPanel, "CART");
-}
+    // Helper method to update the total price display
+    private void updateTotalPrice(List<Purchase> purchases) {
+        double totalPrice = purchases.stream()
+                .mapToDouble(Purchase::getTotalPrice)
+                .sum();
+        // Find the total price label and update it
+        Component[] components = mainPanel.getComponents();
+        for (Component component : components) {
+            if (component instanceof JPanel) {
+                JPanel panel = (JPanel) component;
+                if (panel.getLayout() instanceof GridBagLayout) {
+                    Component[] panelComponents = panel.getComponents();
+                    for (Component c : panelComponents) {
+                        if (c instanceof JLabel && ((JLabel) c).getText().startsWith("$")) {
+                            ((JLabel) c).setText(String.format("$%.2f", totalPrice));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     private void updateItemCombo(JComboBox<Object> itemCombo, String type) {
         itemCombo.removeAllItems();

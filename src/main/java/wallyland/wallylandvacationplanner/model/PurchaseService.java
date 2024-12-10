@@ -92,6 +92,15 @@ public class PurchaseService {
             .toList();
     }
 
+    //added for cart removal/updates
+    public boolean removeFromCart(String userId, Purchase purchaseToRemove) {
+        return cart.removeIf(purchase ->
+                purchase.getUserId().equals(userId) &&
+                        purchase.getItem() == purchaseToRemove.getItem() &&
+                        purchase.getQuantity() == purchaseToRemove.getQuantity()
+        );
+    }
+
     public double calculateTotal(String itemId, int quantity) {
         Object item = availableItems.get(itemId);
         if (item instanceof Ticket) {
@@ -156,6 +165,17 @@ public class PurchaseService {
 
         return itemPrice * quantity;
     }
+
+    public double getUnitPrice() {
+        if (item instanceof Ticket) {
+            return ((Ticket) item).getPrice();
+        } else if (item instanceof Food) {
+            return ((Food) item).getPrice();
+        } else if (item instanceof Drinks) {
+            return ((Drinks) item).getPrice();
+        }
+        return 0.0;
+    }
     
     @Override
     public String toString() {
@@ -169,5 +189,27 @@ public class PurchaseService {
         return "Unknown item - Quantity: " + quantity;
     }
    }
+
+   //added for updates to cart prior to checkout, functionality to remove items (all, some, or none)
+    public boolean updateCartItemQuantity(String userId, Purchase purchaseToUpdate, int newQuantity) {
+        if (newQuantity < 0) return false;
+
+        for (Purchase purchase : cart) {
+            if (purchase.getUserId().equals(userId) && purchase.getItem() == purchaseToUpdate.getItem()) {
+                if (newQuantity == 0) {
+                    cart.remove(purchase);
+                } else {
+                    // Create a new Purchase with updated quantity
+                    Purchase updatedPurchase = new Purchase(userId, purchase.getItem(), newQuantity);
+                    cart.remove(purchase);
+                    cart.add(updatedPurchase);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }
 
