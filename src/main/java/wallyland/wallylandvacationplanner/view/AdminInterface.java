@@ -88,23 +88,58 @@ public class AdminInterface extends JFrame {
         statsTextArea.setText("Total Visitors: 5200\nTotal Sales: $105,000\nActive Activities: 27\nTotal Feedback: 220");
     }
 
-    public void showReports() {
-        JPanel reportsPanel = new JPanel();
-        reportsPanel.setLayout(new BorderLayout());
+   public void showReports() {
+    JPanel reportsPanel = new JPanel();
+    reportsPanel.setLayout(new BorderLayout());
 
-        JLabel titleLabel = new JLabel("Reports", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        reportsPanel.add(titleLabel, BorderLayout.NORTH);
+    JLabel titleLabel = new JLabel("Reports", SwingConstants.CENTER);
+    titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+    reportsPanel.add(titleLabel, BorderLayout.NORTH);
 
-        JTextArea reportsTextArea = new JTextArea(10, 30);
-        reportsTextArea.setEditable(false);
-        reportsTextArea.setText("Report 1: Activity Stats\nReport 2: User Purchases\nReport 3: Feedback Summary");
-        reportsPanel.add(new JScrollPane(reportsTextArea), BorderLayout.CENTER);
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.setLayout(new GridLayout(3, 1));  // 3 buttons for 3 reports
 
-        mainPanel.add(reportsPanel, "REPORTS");
-        cardLayout.show(mainPanel, "REPORTS");
-    }
+    // Create buttons for each report
+    JButton report1Button = new JButton("Report 1: Activity Stats");
+    JButton report2Button = new JButton("Report 2: User Purchases");
+    JButton report3Button = new JButton("Report 3: Feedback Summary");
 
+    // Add action listeners to buttons
+    report1Button.addActionListener(e -> showAReport("Activity Stats Report", " All Activities: Green   Active Users: 27   Popular Activities: Ferris wheel, Magic Show, Rollercoaster."));
+    report2Button.addActionListener(e -> showAReport("User Purchases Report", "Total Stock Purchased: 237/500 , Tickets:120 Adult today, 175 Kids today, 1000 Adult this month, 1200 Kids this month. Drinks: 200 Water, 127 Soft. Food: 100 Hamburgers, 277 Pizzas."));
+    report3Button.addActionListener(e -> showAReport("Feedback Summary Report", "User Feedback: 100 positive, 27 neutral, 5 negative comments."));
+
+    buttonPanel.add(report1Button);
+    buttonPanel.add(report2Button);
+    buttonPanel.add(report3Button);
+
+    reportsPanel.add(buttonPanel, BorderLayout.CENTER);
+
+    mainPanel.add(reportsPanel, "REPORTS");
+    cardLayout.show(mainPanel, "REPORTS");
+}
+
+private void showAReport(String reportTitle, String reportContent) {
+    JPanel reportPanel = new JPanel();
+    reportPanel.setLayout(new BorderLayout());
+
+    JLabel reportTitleLabel = new JLabel(reportTitle, SwingConstants.CENTER);
+    reportTitleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+    reportPanel.add(reportTitleLabel, BorderLayout.NORTH);
+
+    JTextArea reportTextArea = new JTextArea(10, 30);
+    reportTextArea.setEditable(false);
+    reportTextArea.setText(reportContent);
+    reportPanel.add(new JScrollPane(reportTextArea), BorderLayout.CENTER);
+
+    JButton backButton = new JButton("Back to Reports");
+    backButton.addActionListener(e -> showReports());
+    reportPanel.add(backButton, BorderLayout.SOUTH);
+
+    mainPanel.add(reportPanel, "A_REPORT");
+    cardLayout.show(mainPanel, "A_REPORT");
+}
+    
     public void displayResourceMetrics() {
         JPanel resourcePanel = new JPanel();
         resourcePanel.setLayout(new BorderLayout());
