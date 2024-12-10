@@ -1,13 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-/**
- *
- * //added potential ideas of methods for furture use
- */
-
 package wallyland.wallylandvacationplanner.model;
 
 import java.util.ArrayList;
@@ -55,5 +45,3 @@ public class Model {
     
   
 }
-
-
