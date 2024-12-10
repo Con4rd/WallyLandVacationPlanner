@@ -1,15 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package wallyland.wallylandvacationplanner.controller;
 
 import wallyland.wallylandvacationplanner.model.Activity;
+import java.util.List;
 
-/**
- *
- * @author njthe
- */
 /**
  * The ActivityController class manages activities by utilizing an instance of 
  * ActivityManager to schedule and cancel activities.
@@ -30,8 +23,13 @@ public class ActivityController {
      * @param activity the activity to be scheduled
      */
     public void scheduleActivity(Activity activity) {
-        activity.scheduleActivity();
-        activityManager.addActivity(activity);
+        if (activity != null && !activity.isScheduled()) {
+            activity.scheduleActivity();
+            activityManager.addActivity(activity);
+            System.out.println("Activity scheduled: " + activity.getName());
+        } else {
+            System.out.println("Activity is either null or already scheduled.");
+        }
     }
 
     /**
@@ -40,7 +38,45 @@ public class ActivityController {
      * @param activity the activity to be canceled
      */
     public void cancelActivity(Activity activity) {
-        activity.cancelActivity();
-        activityManager.removeActivity(activity);
+        if (activity != null && activity.isScheduled()) {
+            activity.cancelActivity();
+            activityManager.removeActivity(activity);
+            System.out.println("Activity canceled: " + activity.getName());
+        } else {
+            System.out.println("Activity is either null or not scheduled.");
+        }
+    }
+
+    /**
+     * Fetches a list of all scheduled activities.
+     * 
+     * @return list of all scheduled activities
+     */
+    public List<Activity> getScheduledActivities() {
+        return activityManager.getScheduledActivities();
+    }
+
+    /**
+     * Searches for an activity by its ID.
+     * 
+     * @param activityId the ID of the activity to search for
+     * @return the activity if found, null otherwise
+     */
+    public Activity getActivityById(String activityId) {
+        return activityManager.getActivityById(activityId);
+    }
+
+    /**
+     * Updates the details of an activity.
+     * 
+     * @param activity the activity with updated details
+     */
+    public void updateActivity(Activity activity) {
+        if (activity != null) {
+            activityManager.updateActivity(activity);
+            System.out.println("Activity updated: " + activity.getName());
+        } else {
+            System.out.println("Activity is null and cannot be updated.");
+        }
     }
 }
