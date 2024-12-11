@@ -1,5 +1,6 @@
 package wallyland.wallylandvacationplanner.view;
 
+
 import wallyland.wallylandvacationplanner.model.Activity;
 import wallyland.wallylandvacationplanner.controller.ActivityManager;
 
@@ -64,6 +65,11 @@ public class ActivityPanel extends JPanel {
                         JOptionPane.ERROR_MESSAGE);
             }
             updateActivityList();
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Please select an activity to schedule.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -76,6 +82,11 @@ public class ActivityPanel extends JPanel {
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
             updateActivityList();
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Please select an activity to cancel.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 }
