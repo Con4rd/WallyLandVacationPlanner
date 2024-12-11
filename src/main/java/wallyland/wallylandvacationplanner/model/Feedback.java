@@ -1,5 +1,7 @@
 package wallyland.wallylandvacationplanner.model;
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a feedback given by a user.
@@ -9,25 +11,18 @@ public class Feedback {
     private String feedbackNo;
     private String userId;
     private String message;
-    private int rating;
+    private int rating; // Rating between 1 and 5
+    private static List<Feedback> feedbackList = new ArrayList<>(); // Static list to hold all feedback
 
-    /**
-     * Constructs a new Feedback.
-     *
-     * @param feedbackNo The number of the feedback.
-     * @param userId     The user who submitted the feedback.
-     * @param message    The feedback content.
-     * @param rating     The rating given by the user.
-     */
+    // Constructor for creating a new feedback
     public Feedback(String feedbackNo, String userId, String message, int rating) {
         this.feedbackNo = feedbackNo;
         this.userId = userId;
         this.message = message;
-        setRating(rating);
+        setRating(rating); // Ensure rating is valid
     }
 
-    // Getters and setters
-
+    // Getter and Setter methods for Feedback properties
     public String getFeedbackNo() {
         return feedbackNo;
     }
@@ -57,35 +52,51 @@ public class Feedback {
     }
 
     public void setRating(int rating) {
-        if (rating < 1 || rating > 5) {
-            throw new IllegalArgumentException("Rating must be between 1 and 5.");
+        if (rating < 1) {
+            this.rating = 1; // Minimum rating
+        } else if (rating > 5) {
+            this.rating = 5; // Maximum rating
+        } else {
+            this.rating = rating;
         }
-        this.rating = rating;
     }
-   
     
+    // Getter for the static feedbackList
+    public static List<Feedback> getFeedbackList() {
+        return feedbackList;
+    }
+
+    // Static method to add feedback to the list
+    public static void addFeedback(Feedback feedback) {
+        feedbackList.add(feedback);
+    }
+    
+    public static void addDummyFeedback() {
+        // Add dummy feedback only if it's not already present
+        if (feedbackList.isEmpty()) {
+            addFeedback(new Feedback("F001", "U001", "Great experience!", 5));
+            addFeedback(new Feedback("F002", "U002", "Needs improvement.", 3));
+            addFeedback(new Feedback("F003", "U003", "Excellent service.", 5));
+        }
+    }
+
+ public static String getAllFeedbackString() {
+    // Make sure the dummy feedback is added first
+    Feedback.addDummyFeedback();
+
+    StringBuilder feedbackString = new StringBuilder();
+
+    // Loop through the list of feedback and append each feedback's string representation
+    for (Feedback feedback : feedbackList) {
+        feedbackString.append(feedback.toString()).append("\n\n");
+    }
+
+    return feedbackString.toString();
+}
+
+    // Method to display feedback as a string
     @Override
     public String toString() {
-        return "Feedback " + feedbackNo + "\n" +
-       "User ID: " + userId + "\n" +
-       "Rating: " + rating +
-       "Message: [" + message + "]" ;
+        return "Feedback No: " + feedbackNo + "\nUser ID: " + userId + "\nMessage: " + message + "\nRating: " + rating;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Feedback feedback = (Feedback) o;
-        return rating == feedback.rating &&
-                Objects.equals(feedbackNo, feedback.feedbackNo) &&
-                Objects.equals(userId, feedback.userId) &&
-                Objects.equals(message, feedback.message);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(feedbackNo, userId, message, rating);
-    }
-    
 }
