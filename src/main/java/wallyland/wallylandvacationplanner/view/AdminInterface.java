@@ -1,4 +1,5 @@
 package wallyland.wallylandvacationplanner.view;
+import wallyland.wallylandvacationplanner.model.Feedback;
 
 import javax.swing.*;
 import java.awt.*;
@@ -139,7 +140,7 @@ private void showAReport(String reportTitle, String reportContent) {
     mainPanel.add(reportPanel, "A_REPORT");
     cardLayout.show(mainPanel, "A_REPORT");
 }
-    
+
     public void displayResourceMetrics() {
         JPanel resourcePanel = new JPanel();
         resourcePanel.setLayout(new BorderLayout());
@@ -157,26 +158,41 @@ private void showAReport(String reportTitle, String reportContent) {
         cardLayout.show(mainPanel, "RESOURCES");
     }
 
-    public void showFeedbackPanel() {
-        JPanel feedbackPanel = new JPanel();
-        feedbackPanel.setLayout(new BorderLayout());
+    // Method to display feedback in the Admin interface
+public void showFeedbackPanel() {
+    JPanel feedbackPanel = new JPanel();
+    feedbackPanel.setLayout(new BorderLayout());
 
-        JLabel titleLabel = new JLabel("User Feedback", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        feedbackPanel.add(titleLabel, BorderLayout.NORTH);
+    JLabel titleLabel = new JLabel("User Feedback", SwingConstants.CENTER);
+    titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+    feedbackPanel.add(titleLabel, BorderLayout.NORTH);
 
-        JTextArea feedbackTextArea = new JTextArea(10, 30);
-        feedbackTextArea.setEditable(false);
-        feedbackTextArea.setText("Feedback 1: Great experience!\nFeedback 2: Needs improvement.\nFeedback 3: Excellent service.");
-        feedbackPanel.add(new JScrollPane(feedbackTextArea), BorderLayout.CENTER);
+    JTextArea feedbackTextArea = new JTextArea(10, 30);
+    feedbackTextArea.setEditable(false);
+    feedbackTextArea.setText(Feedback.getAllFeedbackString());  // Show all feedback here
+    feedbackPanel.add(new JScrollPane(feedbackTextArea), BorderLayout.CENTER);
 
-        JButton respondButton = new JButton("Respond to Feedback");
-        respondButton.addActionListener(e -> respondToFeedback());
-        feedbackPanel.add(respondButton, BorderLayout.SOUTH);
+    JButton respondButton = new JButton("Respond to Feedback");
+    respondButton.addActionListener(e -> respondToFeedback());
+    feedbackPanel.add(respondButton, BorderLayout.SOUTH);
 
-        mainPanel.add(feedbackPanel, "FEEDBACK");
-        cardLayout.show(mainPanel, "FEEDBACK");
-    }
+    mainPanel.add(feedbackPanel, "FEEDBACK");
+    cardLayout.show(mainPanel, "FEEDBACK");
+}
+
+// Helper method to format all feedback (dummy + new feedback)
+private String getAllFeedbackString() {
+    StringBuilder feedbackString = new StringBuilder();
+    // Add dummy feedback (although it should be done via the Feedback class)
+    feedbackString.append("Feedback 1: Great experience!\nRating: 5\n");
+    feedbackString.append("Feedback 2: Needs improvement.\nRating: 3\n");
+    feedbackString.append("Feedback 3: Excellent service.\nRating: 5\n");
+
+    // Access all feedback through the Feedback class's static method
+    feedbackString.append(Feedback.getAllFeedbackString()); // This will add all stored feedback from the static list
+
+    return feedbackString.toString();
+}
 
     private void respondToFeedback() {
         String response = JOptionPane.showInputDialog(this, "Enter your response to the feedback:");
