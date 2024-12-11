@@ -2,9 +2,11 @@ package wallyland.wallylandvacationplanner.view;
 
 import wallyland.wallylandvacationplanner.model.*;
 import wallyland.wallylandvacationplanner.controller.ActivityManager;
-import wallyland.wallylandvacationplanner.view.ActivityPanel;
+import wallyland.wallylandvacationplanner.model.Feedback;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import java.time.format.DateTimeFormatter;
 import java.awt.event.MouseAdapter;
@@ -67,6 +69,13 @@ public class UserInterface extends JFrame {
         JMenuItem foodItem = new JMenuItem("Food & Drinks");
         shopMenu.add(ticketsItem);
         shopMenu.add(foodItem);
+        
+        // Add Feedback menu item to the menu bar
+        JMenu feedbackMenu = new JMenu("Feedback");
+        JMenuItem feedbackItem = new JMenuItem("Submit Feedback");
+        feedbackItem.addActionListener(e -> displayFeedbackForm());
+        feedbackMenu.add(feedbackItem);
+        menuBar.add(feedbackMenu);
 
         // Add actions to menu items
         ticketsItem.addActionListener(e -> showPurchaseForm("TICKET"));
@@ -214,15 +223,6 @@ public class UserInterface extends JFrame {
         });
         purchasePanel.add(addToCartButton, gbc);
 
-      // Purchase History Button (Updated)
-    //gbc.gridx = 1; // Move to next column for Purchase History button
-    //JButton purchaseHistoryButton = new JButton("View Purchase History");
-   // purchaseHistoryButton.addActionListener(e -> {
-        // Fetch and display the user's purchase history
-       // showPurchaseHistory("U001");  // Pass user ID dynamically if needed
-    //});
-    //purchasePanel.add(purchaseHistoryButton, gbc);
-
     mainPanel.add(purchasePanel, "PURCHASE");
     cardLayout.show(mainPanel, "PURCHASE");
 }
@@ -271,6 +271,59 @@ public class UserInterface extends JFrame {
         historyDialog.setSize(400, 400);
         historyDialog.setLocationRelativeTo(this);
         historyDialog.setVisible(true);
+    }
+    
+     // Method to display the feedback form
+    public void displayFeedbackForm() {
+        JPanel feedbackPanel = new JPanel();
+        feedbackPanel.setLayout(new BorderLayout());
+
+        JLabel titleLabel = new JLabel("Submit Your Feedback", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        feedbackPanel.add(titleLabel, BorderLayout.NORTH);
+
+        JPanel formPanel = new JPanel();
+        formPanel.setLayout(new GridLayout(3, 1));
+
+        // Feedback message text area
+        JTextArea messageArea = new JTextArea(4, 30);
+        JScrollPane messageScrollPane = new JScrollPane(messageArea);
+        formPanel.add(messageScrollPane);
+
+        // Rating combo box
+        String[] ratings = {"1", "2", "3", "4", "5"};
+        JComboBox<String> ratingComboBox = new JComboBox<>(ratings);
+        formPanel.add(ratingComboBox);
+
+        // Submit button
+        JButton submitButton = new JButton("Submit Feedback");
+        submitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Get the user's input
+                String message = messageArea.getText().trim();
+                int rating = Integer.parseInt((String) ratingComboBox.getSelectedItem());
+
+                if (!message.isEmpty()) {
+                    // Create new feedback and add it to the Feedback list
+                    String feedbackNo = "F" + (Feedback.getFeedbackList().size() + 1);
+                    Feedback feedback = new Feedback(feedbackNo, "U001", message, rating);
+                    Feedback.addFeedback(feedback);
+
+                    // Show confirmation
+                    JOptionPane.showMessageDialog(UserInterface.this, "Feedback submitted successfully!");
+                    messageArea.setText("");  // Clear message area
+                    ratingComboBox.setSelectedIndex(0);  // Reset the rating combo box
+                } else {
+                    JOptionPane.showMessageDialog(UserInterface.this, "Please enter a message.");
+                }
+            }
+        });
+        formPanel.add(submitButton);
+
+        feedbackPanel.add(formPanel, BorderLayout.CENTER);
+        mainPanel.add(feedbackPanel, "FEEDBACK_FORM");
+        cardLayout.show(mainPanel, "FEEDBACK_FORM");
     }
 
 
@@ -607,4 +660,3 @@ public class UserInterface extends JFrame {
         cardLayout.show(mainPanel, "ACTIVITIES");
     }
 }
-
