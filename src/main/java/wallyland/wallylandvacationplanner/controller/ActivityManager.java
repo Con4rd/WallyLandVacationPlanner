@@ -71,20 +71,21 @@ public class ActivityManager {
      * @param activityId the ID of the activity to schedule
      * @return true if the activity was scheduled successfully, false otherwise
      */
-   public boolean scheduleActivity(String activityId) {
-    Activity activity = activities.get(activityId);
-    if (activity != null) {
-        // Check if the activity is operational and has capacity
-        if (activity.isScheduled()) {
-            return false; // Already scheduled
+
+    public boolean scheduleActivity(String activityId) {
+        Activity activity = activities.get(activityId);
+        if (activity != null) {
+            // Check if the activity is operational and has capacity
+            if (activity.isScheduled()) {
+                return false; // Already scheduled
+            }
+            if (activity.getDailyScheduled() < activity.getDailyCapacity() && activity.isOperational()) {
+                activity.scheduleActivity();
+                return true; // Activity successfully scheduled
+            }
         }
-        if (activity.getCurrentCapacity() < activity.getCapacity() && activity.isOperational()) {
-            activity.scheduleActivity();
-            return true; // Activity successfully scheduled
-        }
+        return false; // Could not schedule activity
     }
-    return false; // Could not schedule activity
-}
 
 public void cancelActivity(String activityId) {
     Activity activity = activities.get(activityId);

@@ -75,7 +75,7 @@ public class UserInterface extends JFrame {
         JMenuItem feedbackItem = new JMenuItem("Submit Feedback");
         feedbackItem.addActionListener(e -> displayFeedbackForm());
         feedbackMenu.add(feedbackItem);
-        menuBar.add(feedbackMenu);
+
 
         // Add actions to menu items
         ticketsItem.addActionListener(e -> showPurchaseForm("TICKET"));
@@ -112,6 +112,7 @@ public class UserInterface extends JFrame {
         menuBar.add(shopMenu);
         menuBar.add(cartMenu);
         menuBar.add(activitiesMenu);
+        menuBar.add(feedbackMenu);
         menuBar.add(adminMenu);  // Add Admin menu to the menu bar
         setJMenuBar(menuBar);
         activitiesMenu.add(manageActivities);
